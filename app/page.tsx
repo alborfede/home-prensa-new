@@ -188,7 +188,7 @@ export default function Home() {
           <div className="red-card-content">
             <span className="red-volanta">Edición Web #103</span>
             <h3 className="red-title">
-              Los palestinos del '48 y las elecciones del apartheid israelí
+              Los palestinos del 48 y las elecciones del apartheid israelí
             </h3>
             <span className="red-author">Revista EDM</span>
           </div>
