@@ -1,11 +1,86 @@
+'use client';
+
+import { useRef } from 'react';
 import Link from 'next/link';
 
 export default function Home() {
+  // Referencias para manipular los carruseles independientes
+  const videoCarouselRef = useRef<HTMLDivElement>(null);
+  const edmCarouselRef = useRef<HTMLDivElement>(null);
+
+  // Funciones carrusel YouTube
+  const scrollLeftVideo = () => {
+    if (videoCarouselRef.current) {
+      videoCarouselRef.current.scrollBy({ left: -320, behavior: 'smooth' });
+    }
+  };
+
+  const scrollRightVideo = () => {
+    if (videoCarouselRef.current) {
+      videoCarouselRef.current.scrollBy({ left: 320, behavior: 'smooth' });
+    }
+  };
+
+  // Funciones carrusel Revista EDM
+  const scrollLeftEdm = () => {
+    if (edmCarouselRef.current) {
+      edmCarouselRef.current.scrollBy({ left: -260, behavior: 'smooth' });
+    }
+  };
+
+  const scrollRightEdm = () => {
+    if (edmCarouselRef.current) {
+      edmCarouselRef.current.scrollBy({ left: 260, behavior: 'smooth' });
+    }
+  };
+
+  // Lógica de arrastre con clic sostenido (Drag to Scroll)
+  const setupDragScroll = (ref: React.RefObject<HTMLDivElement>) => {
+    let isDown = false;
+    let startX: number;
+    let scrollLeft: number;
+
+    const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+      const slider = ref.current;
+      if (!slider) return;
+      isDown = true;
+      slider.classList.add('is-dragging');
+      startX = e.pageX - slider.offsetLeft;
+      scrollLeft = slider.scrollLeft;
+    };
+
+    const handleMouseLeaveOrUp = () => {
+      const slider = ref.current;
+      if (!slider) return;
+      isDown = false;
+      slider.classList.remove('is-dragging');
+    };
+
+    const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+      const slider = ref.current;
+      if (!isDown || !slider) return;
+      e.preventDefault();
+      const x = e.pageX - slider.offsetLeft;
+      const walk = (x - startX) * 1.5;
+      slider.scrollLeft = scrollLeft - walk;
+    };
+
+    return {
+      onMouseDown: handleMouseDown,
+      onMouseLeave: handleMouseLeaveOrUp,
+      onMouseUp: handleMouseLeaveOrUp,
+      onMouseMove: handleMouseMove,
+    };
+  };
+
+  const videoDragProps = setupDragScroll(videoCarouselRef);
+  const edmDragProps = setupDragScroll(edmCarouselRef);
+
   return (
     <div className="clarin-home-wrapper">
       {/* GRILLA PRINCIPAL DE NOTICIAS */}
       <div className="clarin-grid-container">
-        {/* NOTICIA PRINCIPAL (COLUMNA IZQUIERDA CON BORDE DIVISOR) */}
+        {/* NOTICIA PRINCIPAL */}
         <article className="article-main main-column-border">
           <div className="main-image-wrapper">
             <img
@@ -30,7 +105,6 @@ export default function Home() {
 
         {/* COLUMNA DERECHA (GRILLA SECUNDARIA 2x2) */}
         <div className="clarin-secondary-grid">
-          {/* CASILLA 1: ARRIBA IZQUIERDA */}
           <article className="secondary-card card-border-right card-border-bottom">
             <img
               src="https://prensaobrera.com/_next/image?url=https%3A%2F%2Fadmin.prensaobrera.com%2Fwp-content%2Fuploads%2FSerbia-estudiantes44.jpg&w=640&q=65"
@@ -45,7 +119,6 @@ export default function Home() {
             <div className="news-author-byline">Fede Picca</div>
           </article>
 
-          {/* CASILLA 2: ARRIBA DERECHA */}
           <article className="secondary-card card-border-bottom">
             <img
               src="https://prensaobrera.com/_next/image?url=https%3A%2F%2Fadmin.prensaobrera.com%2Fwp-content%2Fuploads%2Finundaciones-1-1.jpeg&w=640&q=65"
@@ -60,7 +133,6 @@ export default function Home() {
             <div className="news-author-byline">Virginia Villanueva</div>
           </article>
 
-          {/* CASILLA 3: ABAJO IZQUIERDA */}
           <article className="secondary-card card-border-right">
             <img
               src="https://prensaobrera.com/_next/image?url=https%3A%2F%2Fadmin.prensaobrera.com%2Fwp-content%2Fuploads%2Fmilei-y-los-lbira.avif&w=640&q=65"
@@ -72,7 +144,6 @@ export default function Home() {
             <div className="news-author-byline">REDACCIÓN</div>
           </article>
 
-          {/* CASILLA 4: ABAJO DERECHA */}
           <div className="vertical-stack">
             <article className="secondary-card card-horizontal card-border-bottom">
               <div className="card-text-side">
@@ -120,26 +191,50 @@ export default function Home() {
         </Link>
       </section>
 
-      {/* SECCIÓN DE VIDEOS DE YOUTUBE */}
+      {/* SECCIÓN: VIDEOS DE YOUTUBE */}
       <section className="youtube-videos-section">
         <div className="youtube-section-header">
-          <span className="news-volanta">MULTIMEDIA</span>
-          <h2 className="youtube-section-title">Últimos Videos</h2>
+          <div>
+            <span className="news-volanta">MULTIMEDIA</span>
+            <h2 className="youtube-section-title">Últimos Videos</h2>
+          </div>
+
+          <div className="carousel-controls">
+            <button
+              type="button"
+              className="carousel-btn"
+              onClick={scrollLeftVideo}
+              aria-label="Anterior video"
+            >
+              <i className="ri-arrow-left-s-line"></i>
+            </button>
+            <button
+              type="button"
+              className="carousel-btn"
+              onClick={scrollRightVideo}
+              aria-label="Siguiente video"
+            >
+              <i className="ri-arrow-right-s-line"></i>
+            </button>
+          </div>
         </div>
 
-        <div className="youtube-grid-container">
+        <div
+          className="youtube-grid-container"
+          ref={videoCarouselRef}
+          {...videoDragProps}
+        >
           <div className="youtube-video-card">
             <div className="video-responsive-wrapper">
               <iframe
                 src="https://www.youtube.com/embed/xwfH4BdjRtY"
-                title="Video de YouTube 1"
+                title="Video 1"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
               ></iframe>
             </div>
             <h3 className="youtube-video-title">
-              BRASIL: DERROTA de BOLSONARO, MILEI y TRUMP | El DEBATE en el FITU
-              | 14 Toneladas
+            BRASIL: DERROTA de BOLSONARO, MILEI y TRUMP | El DEBATE en el FITU | 14 Toneladas
             </h3>
           </div>
 
@@ -147,19 +242,48 @@ export default function Home() {
             <div className="video-responsive-wrapper">
               <iframe
                 src="https://www.youtube.com/embed/XRU8E0PdVoI"
-                title="Video de YouTube 2"
+                title="Video 2"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
               ></iframe>
             </div>
             <h3 className="youtube-video-title">
-              El formidable paro del subte es la punta de un iceberg | EDITORIAL
+            El formidable paro del subte es la punta de un iceberg | EDITORIAL
+            </h3>
+          </div>
+
+          <div className="youtube-video-card">
+            <div className="video-responsive-wrapper">
+              <iframe
+                src="https://www.youtube.com/embed/BkYYQhik55E"
+                title="Video 3"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              ></iframe>
+            </div>
+            <h3 className="youtube-video-title">
+              BRASIL: DERROTA de BOLSONARO, MILEI y TRUMP | 14 TONELADAS
+            </h3>
+          </div>
+
+          <div className="youtube-video-card">
+            <div className="video-responsive-wrapper">
+              <iframe
+                src="https://www.youtube.com/embed/mB8DmjbyXD0"
+                title="Video 4"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              ></iframe>
+            </div>
+            <h3 className="youtube-video-title">
+              EL DEBATE en el FRENTE DE IZQUIERDA | 14 TONELADAS
             </h3>
           </div>
         </div>
       </section>
+
       {/* ========================================== */}
-      {/* CABECERA DE SECCIÓN CON LOGO DE EDM        */}
+      {/* CABECERA DE SECCIÓN CON LOGO DE EDM Y BOTONES */}
       {/* ========================================== */}
       <div className="edm-section-header">
         <Link href="https://revistaedm.com.ar" target="_blank">
@@ -169,12 +293,57 @@ export default function Home() {
             className="edm-section-logo"
           />
         </Link>
+
+        {/* Botones de navegación del carrusel EDM */}
+        <div className="carousel-controls">
+          <button
+            type="button"
+            className="carousel-btn"
+            onClick={scrollLeftEdm}
+            aria-label="Anterior artículo EDM"
+          >
+            <i className="ri-arrow-left-s-line"></i>
+          </button>
+          <button
+            type="button"
+            className="carousel-btn"
+            onClick={scrollRightEdm}
+            aria-label="Siguiente artículo EDM"
+          >
+            <i className="ri-arrow-right-s-line"></i>
+          </button>
+        </div>
       </div>
+
       {/* ========================================== */}
-      {/* SECCIÓN: 5 ARTÍCULOS DE REVISTA EDM EN ROJO*/}
+      {/* SECCIÓN: CARRUSEL 7 ARTÍCULOS REVISTA EDM   */}
       {/* ========================================== */}
-      <section className="five-articles-red-grid">
-        {/* Artículo 1 */}
+      <section
+        className="five-articles-red-grid"
+        ref={edmCarouselRef}
+        {...edmDragProps}
+      >
+        {/* 1. Nuevo Artículo 1 */}
+        <Link
+          href="https://revistaedm.com.ar/nota/guerras-imperialistas-e-inflacion-global"
+          target="_blank"
+          className="red-card"
+        >
+          <img
+            src="https://revistaedm.com.ar/api/image/wp-content/uploads/2026/10/asfsas.png"
+            alt="Guerras imperialistas e inflación global"
+            className="red-card-img"
+          />
+          <div className="red-card-content">
+            <span className="red-volanta">Edición Web #103</span>
+            <h3 className="red-title">
+              Guerras imperialistas e inflación global
+            </h3>
+            <span className="red-author">Sergio Rivero</span>
+          </div>
+        </Link>
+
+        {/* 2. Artículo Original 1 */}
         <Link
           href="https://revistaedm.com.ar/nota/los-palestinos-del-48-y-las-elecciones-del-apartheid-israeli"
           target="_blank"
@@ -188,13 +357,13 @@ export default function Home() {
           <div className="red-card-content">
             <span className="red-volanta">Edición Web #103</span>
             <h3 className="red-title">
-              Los palestinos del 48 y las elecciones del apartheid israelí
+              Los palestinos del &apos;48 y las elecciones del apartheid israelí
             </h3>
-            <span className="red-author">Revista EDM</span>
+            <span className="red-author">Yoav Haifawi</span>
           </div>
         </Link>
 
-        {/* Artículo 2 */}
+        {/* 3. Artículo Original 2 */}
         <Link
           href="https://revistaedm.com.ar/nota/la-cuestion-irlandesa-parte-i"
           target="_blank"
@@ -208,11 +377,11 @@ export default function Home() {
           <div className="red-card-content">
             <span className="red-volanta">Edición Web #103</span>
             <h3 className="red-title">La cuestión irlandesa (Parte I)</h3>
-            <span className="red-author">Revista EDM</span>
+            <span className="red-author">Daniel Rapanelli</span>
           </div>
         </Link>
 
-        {/* Artículo 3 */}
+        {/* 4. Artículo Original 3 */}
         <Link
           href="https://revistaedm.com.ar/nota/una-critica-a-la-historia-del-movimiento-piquetero-de-francisco-longa"
           target="_blank"
@@ -229,11 +398,11 @@ export default function Home() {
               Una crítica a la historia del movimiento piquetero de Francisco
               Longa
             </h3>
-            <span className="red-author">Revista EDM</span>
+            <span className="red-author">Emanuel Berardo</span>
           </div>
         </Link>
 
-        {/* Artículo 4 */}
+        {/* 5. Artículo Original 4 */}
         <Link
           href="https://revistaedm.com.ar/nota/programa-estrategia-y-partido-el-debate-en-el-frente-de-izquierda-de-la-argentina"
           target="_blank"
@@ -245,16 +414,18 @@ export default function Home() {
             className="red-card-img"
           />
           <div className="red-card-content">
-            <span className="red-volanta">Edición Web #103</span>
+            <span className="red-volanta">Edición Web #102</span>
             <h3 className="red-title">
               Programa, estrategia y partido: el debate en el Frente de
               Izquierda
             </h3>
-            <span className="red-author">Revista EDM</span>
+            <span className="red-author">
+              Pablo Giachello, Gabriel Solano
+            </span>
           </div>
         </Link>
 
-        {/* Artículo 5 */}
+        {/* 6. Artículo Original 5 */}
         <Link
           href="https://revistaedm.com.ar/nota/a-70-anos-de-la-revolucion-politica-de-la-clase-obrera-hungara"
           target="_blank"
@@ -266,11 +437,31 @@ export default function Home() {
             className="red-card-img"
           />
           <div className="red-card-content">
-            <span className="red-volanta">Edición Web #103</span>
+            <span className="red-volanta">Edición Web #102</span>
             <h3 className="red-title">
               A 70 años de la revolución política de la clase obrera húngara
             </h3>
-            <span className="red-author">Revista EDM</span>
+            <span className="red-author">Maco Alonso</span>
+          </div>
+        </Link>
+
+        {/* 7. Nuevo Artículo 2 */}
+        <Link
+          href="https://revistaedm.com.ar/nota/andres-nin-leon-trotsky-y-la-revolucion-espanola-parte-iv-y-ultima/"
+          target="_blank"
+          className="red-card"
+        >
+          <img
+            src="https://revistaedm.com.ar/api/image/wp-content/uploads/2026/10/WhatsApp-Image-2026-10-09-at-23.54.33.jpeg"
+            alt="Andrés Nin, León Trotsky y la Revolución Española"
+            className="red-card-img"
+          />
+          <div className="red-card-content">
+            <span className="red-volanta">Edición Web #102</span>
+            <h3 className="red-title">
+              Andrés Nin, León Trotsky y la Revolución Española (Parte IV)
+            </h3>
+            <span className="red-author">Luis Oviedo</span>
           </div>
         </Link>
       </section>

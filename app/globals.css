@@ -713,75 +713,137 @@ body {
   }
 }
 /* ==========================================
-   SECCIÓN DE VIDEOS DE YOUTUBE
+   SECCIÓN DE VIDEOS DE YOUTUBE (CARRUSEL 2 VIDEOS)
    ========================================== */
-.youtube-videos-section {
-  margin-top: 36px;
-  padding: 20px 0;
-  border-top: 1px solid var(--border-color);
-  border-bottom: 1px solid var(--border-color);
-}
-
-.youtube-section-header {
-  margin-bottom: 16px;
-}
-
-.youtube-section-title {
-  font-family: 'Roboto', sans-serif;
-  font-size: 22px;
-  font-weight: 800;
-  color: var(--text-main);
-  margin-top: 2px;
-}
-
-.youtube-grid-container {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 24px;
-}
-
-.youtube-video-card {
-  display: flex;
-  flex-direction: column;
-}
-
-/* Contenedor responsivo 16:9 para iframes */
-.video-responsive-wrapper {
-  position: relative;
-  width: 100%;
-  padding-bottom: 56.25%; /* Relación de aspecto 16:9 */
-  height: 0;
-  background-color: #000;
-  border-radius: 4px;
-  overflow: hidden;
-  margin-bottom: 10px;
-}
-
-.video-responsive-wrapper iframe {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  border: 0;
-}
-
-.youtube-video-title {
-  font-family: 'Roboto', sans-serif;
-  font-size: 15px;
-  font-weight: 700;
-  line-height: 1.3;
-  color: var(--text-main);
-  margin: 0;
-}
-
-/* Adaptación responsive para pantallas chicas */
-@media (max-width: 768px) {
-  .youtube-grid-container {
-    grid-template-columns: 1fr; /* Se apilan en una sola columna en móviles */
-    gap: 20px;
+   .youtube-videos-section {
+    margin-top: 36px;
+    padding: 20px 0;
+    border-top: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-color);
   }
+  
+  .youtube-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 16px;
+  }
+  
+  .youtube-section-title {
+    font-family: 'Roboto', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--text-main);
+    margin-top: 2px;
+  }
+  
+  .carousel-controls {
+    display: flex;
+    gap: 8px;
+  }
+  
+  .carousel-btn {
+    background-color: #f2f3f5;
+    border: 1px solid var(--border-color);
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    color: var(--text-main);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .carousel-btn:hover {
+    background-color: var(--red-po);
+    color: #ffffff;
+    border-color: var(--red-po);
+  }
+  
+  /* CONTENEDOR CARRUSEL CON SCROLL OCULTO Y SIZING DE 2 COLUMNAS */
+  .youtube-grid-container {
+    display: flex;
+    gap: 24px;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    scroll-snap-type: x mandatory;
+    padding-bottom: 6px;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .youtube-grid-container::-webkit-scrollbar {
+    display: none; /* Oculta la barra de desplazamiento */
+  }
+  
+  .youtube-grid-container {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  /* CADA TARJETA OCUPA EXACTAMENTE EL 50% (2 VIDEOS VISIBLES) */
+  .youtube-video-card {
+    flex: 0 0 calc(50% - 12px);
+    min-width: calc(50% - 12px);
+    scroll-snap-align: start;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .video-responsive-wrapper {
+    position: relative;
+    width: 100%;
+    padding-bottom: 56.25%; /* Relación de aspecto 16:9 */
+    height: 0;
+    background-color: #000;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 10px;
+  }
+  
+  .video-responsive-wrapper iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+  
+  .youtube-video-title {
+    font-family: 'Roboto', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.3;
+    color: var(--text-main);
+    margin: 0;
+  }
+
+  /* Previene que el iframe de YouTube capture el evento de arrastre */
+.youtube-video-card iframe {
+  pointer-events: auto;
 }
+
+/* Cuando se está haciendo Drag, desactiva la interacción del iframe temporalmente */
+.youtube-grid-container.is-dragging iframe {
+  pointer-events: none !important;
+}
+
+/* Evita la selección accidental de elementos durante el arrastre */
+.youtube-grid-container {
+  touch-action: pan-x;
+  user-select: none;
+  -webkit-user-select: none;
+}
+  
+  @media (max-width: 768px) {
+    .youtube-video-card {
+      flex: 0 0 85%;
+      min-width: 85%;
+    }
+  }
 /* ==========================================
    SECCIÓN DE 5 ARTÍCULOS EN FONDO ROJO PO
    ========================================== */
@@ -871,22 +933,154 @@ body {
 /* ==========================================
    CABECERA DE SECCIÓN CON LOGO DE EDM
    ========================================== */
-.edm-section-header {
-  width: 100%;
-  margin-top: 38px;
-  margin-bottom: 12px;
-  display: flex;
-  justify-content: flex-start; /* Justificado a la izquierda */
-  align-items: center;
+   .edm-section-header {
+    width: 100%;
+    margin-top: 38px;
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between; /* Alinea el logo a la izquierda y los botones a la derecha */
+    align-items: center;
+  }
+  
+  .edm-section-logo {
+    width: 120px;
+    height: auto;
+    display: block;
+    transition: opacity 0.2s ease;
+  }
+  
+  .edm-section-logo:hover {
+    opacity: 0.85;
+  }
+  
+  /* ==========================================
+     CARRUSEL DE ARTÍCULOS EN FONDO ROJO PO (EDM)
+     ========================================== */
+  .five-articles-red-grid {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap; /* Mantiene todos los artículos en una sola fila */
+    gap: 12px;
+    margin-top: 16px;
+    margin-bottom: 32px;
+    width: 100%;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    scroll-snap-type: x mandatory;
+    padding-bottom: 8px;
+    -webkit-overflow-scrolling: touch;
+  
+    /* Ocultar barra de scroll */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  
+  .five-articles-red-grid::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .red-card {
+    background-color: var(--red-po);
+    color: #ffffff;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    border-radius: 4px;
+    box-sizing: border-box;
+    text-decoration: none !important;
+    transition: opacity 0.2s ease;
+    cursor: pointer;
+  
+    /* Mantiene exactamente 5 tarjetas visibles en pantallas desktop */
+    flex: 0 0 calc(20% - 9.6px);
+    min-width: calc(20% - 9.6px);
+    max-width: calc(20% - 9.6px);
+    scroll-snap-align: start;
+  }
+  
+  .red-card:hover {
+    opacity: 0.92;
+    text-decoration: none !important;
+  }
+  
+  .red-card-img {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    margin-bottom: 10px;
+    display: block;
+  }
+  
+  .red-card-content {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    justify-content: space-between;
+  }
+  
+  .red-volanta {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: #f8d7da;
+    margin-bottom: 6px;
+  }
+  
+  .red-title {
+    font-family: 'Roboto', sans-serif;
+    font-size: 13.5px;
+    font-weight: 700;
+    line-height: 1.3;
+    color: #ffffff;
+    margin: 0 0 12px 0;
+    text-decoration: none !important;
+  }
+  
+  .red-author {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: #e2e2e2;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    padding-top: 8px;
+  }
+  
+  /* RESPONSIVE PARA TABLETS Y MÓVILES */
+  @media (max-width: 1100px) {
+    .red-card {
+      flex: 0 0 calc(33.33% - 8px);
+      min-width: calc(33.33% - 8px);
+      max-width: calc(33.33% - 8px);
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .red-card {
+      flex: 0 0 80%;
+      min-width: 80%;
+      max-width: 80%;
+    }
+  }
+
+  /* ==========================================
+   ESTILOS PARA CURSOR GRAB / DRAGGING
+   ========================================== */
+.youtube-grid-container,
+.five-articles-red-grid {
+  cursor: grab;
+  user-select: none;
 }
 
-.edm-section-logo {
-  width: 120px; /* Reducido a 1/3 de su tamaño original */
-  height: auto;
-  display: block;
-  transition: opacity 0.2s ease;
+.youtube-grid-container.is-dragging,
+.five-articles-red-grid.is-dragging {
+  cursor: grabbing;
+  scroll-snap-type: none !important; /* Desactiva el auto-snap momentáneamente mientras se arrastra */
+  scroll-behavior: auto !important;
 }
 
-.edm-section-logo:hover {
-  opacity: 0.85;
+.youtube-grid-container.is-dragging *,
+.five-articles-red-grid.is-dragging * {
+  pointer-events: none; /* Evita clics accidentales en enlaces mientras se arrastra con el mouse */
 }
